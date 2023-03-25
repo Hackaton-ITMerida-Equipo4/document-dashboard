@@ -12,11 +12,10 @@ import store from './store'
 /* Vue. Main component */
 import App from './App.vue'
 
-/* Fetch sample data */
-store.dispatch('fetch', 'clients')
+import './utils/filter'
 
 /* Default title tag */
-const defaultDocumentTitle = 'Admin One Bulma Buefy'
+const defaultDocumentTitle = 'Syncrony Bulma Buefy'
 
 /* Collapse mobile aside menu on route change & set document title from route meta */
 router.afterEach(to => {

@@ -1,30 +1,15 @@
 <template>
-  <card-component
-    title="Login"
-    icon="lock"
-  >
-    <router-link
-      slot="button"
-      to="/"
-      class="button is-small"
-    >
+  <card-component title="Login" icon="lock">
+    <router-link slot="button" to="/" class="button is-small">
       Dashboard
     </router-link>
 
-    <form
-      method="POST"
-      @submit.prevent="submit"
-    >
-      <b-field label="E-mail Address">
-        <b-input
-          v-model="form.email"
-          name="email"
-          type="email"
-          required
-        />
+    <form method="POST" @submit.prevent="submit">
+      <b-field label="Username">
+        <b-input v-model="form.username" name="username" required />
       </b-field>
 
-      <b-field label="Password">
+      <b-field label="Contraseña">
         <b-input
           v-model="form.password"
           type="password"
@@ -33,35 +18,13 @@
         />
       </b-field>
 
-      <b-field>
-        <b-checkbox
-          v-model="form.remember"
-          type="is-black"
-          class="is-thin"
-        >
-          Remember me
-        </b-checkbox>
-      </b-field>
-
-      <hr>
+      <hr />
 
       <b-field grouped>
         <div class="control">
-          <b-button
-            native-type="submit"
-            type="is-black"
-            :loading="isLoading"
-          >
+          <b-button native-type="submit" type="is-black" :loading="isLoading">
             Login
           </b-button>
-        </div>
-        <div class="control">
-          <router-link
-            to="/"
-            class="button is-outlined is-black"
-          >
-            Dashboard
-          </router-link>
         </div>
       </b-field>
     </form>
@@ -71,29 +34,43 @@
 <script>
 import { defineComponent } from 'vue'
 import CardComponent from '@/components/CardComponent.vue'
+import redirect from '@/mixins/redirect'
 
 export default defineComponent({
   name: 'LoginView',
   components: { CardComponent },
+  mixins: [redirect],
   data () {
     return {
       isLoading: false,
       form: {
-        email: 'john.doe@example.com',
-        password: 'my-secret-password-9e9w',
-        remember: false
+        email: '',
+        password: ''
       }
     }
   },
   methods: {
-    submit () {
+    async submit () {
+      // Marca la función como asíncrona
       this.isLoading = true
 
-      setTimeout(() => {
+      try {
+        await this.$store.dispatch('auth/login', this.form)
+        this.$router.push({
+          path: this.redirect || '/',
+          query: this.otherQuery
+        })
+      } catch (error) {
+        // Si la petición falla, muestra un mensaje de error
         this.isLoading = false
-
-        this.$router.push('/')
-      }, 750)
+        console.error(error)
+        this.$buefy.snackbar.open({
+          duration: 5000,
+          message: 'Credenciales incorrectas.',
+          type: 'is-danger',
+          queue: false
+        })
+      }
     }
   }
 })
